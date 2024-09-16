@@ -6,7 +6,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { ChevronDownIcon } from "@radix-ui/react-icons";
+
+import { ChevronDown, Filter } from "lucide-react";
 import { useState } from "react";
 
 const SORT_OPTIONS = [
@@ -31,7 +32,7 @@ export default function Home() {
           <DropdownMenu>
             <DropdownMenuTrigger className="group inline-flex justify-center text-sm font-medium text-gray-700 hover:text-gray-900">
               Sort
-              <ChevronDownIcon className="-mr-1 ml-1 h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-gray-500" />
+              <ChevronDown className="-mr-1 ml-1 h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-gray-500" />
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end">
@@ -54,6 +55,9 @@ export default function Home() {
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
+          <button className="-m-2 ml-4 p-2 text-gray-400 hover:text-gray-500 sm:ml-6 lg:hidden">
+            <Filter className="h-5 w-5" />
+          </button>
         </div>
       </div>
     </main>
