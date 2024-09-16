@@ -1,11 +1,12 @@
 "use client";
 
+import Product from "@/components/Product";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Product } from "@/db";
+import { ProductType as TProduct } from "@/db";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { QueryResult } from "@upstash/vector";
@@ -27,7 +28,7 @@ export default function Home() {
   const { data: products } = useQuery({
     queryKey: ["products"],
     queryFn: async () => {
-      const { data } = await axios.post<QueryResult<Product>[]>(
+      const { data } = await axios.post<QueryResult<TProduct>[]>(
         "http://localhost:3000/api/products",
         {
           filter: {
@@ -40,7 +41,6 @@ export default function Home() {
     },
   });
 
-  console.log(products);
   return (
     <main className="mx-auto max-w-7xl ox-4 sm:px-6 lg:px-8">
       <div className="flex items-baseline justify-between border-b border-gray-200 pb-6 pt-24">
@@ -79,6 +79,18 @@ export default function Home() {
           </button>
         </div>
       </div>
+      <section className="pb-24 pt-6 ">
+        <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-4">
+          {/* Filters to enter here */}
+          <div></div>
+          {/* Product grid */}
+          <ul className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+            {products?.map((product) => (
+              <Product key={product.id} product={product.metadata!} />
+            ))}
+          </ul>
+        </div>
+      </section>
     </main>
   );
 }
