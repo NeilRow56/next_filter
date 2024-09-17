@@ -94,6 +94,9 @@ export default function Home() {
         {
           filter: {
             sort: filter.sort,
+            color: filter.color,
+            size: filter.size,
+            price: filter.price,
           },
         }
       );
