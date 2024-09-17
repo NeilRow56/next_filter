@@ -23,6 +23,7 @@ import { ChevronDown, Filter } from "lucide-react";
 import { useCallback, useState } from "react";
 import debounce from "lodash.debounce";
 import { Slider } from "@/components/ui/slider";
+import EmptyState from "@/components/EmptyState";
 
 const SORT_OPTIONS = [
   { name: "None", value: "none" },
@@ -86,7 +87,7 @@ export default function Home() {
     sort: "none",
   });
 
-  const { data: products } = useQuery({
+  const { data: products, refetch } = useQuery({
     queryKey: ["products"],
     queryFn: async () => {
       const { data } = await axios.post<QueryResult<TProduct>[]>(
@@ -96,7 +97,7 @@ export default function Home() {
             sort: filter.sort,
             color: filter.color,
             size: filter.size,
-            price: filter.price,
+            price: filter.price.range,
           },
         }
       );
@@ -104,6 +105,12 @@ export default function Home() {
       return data;
     },
   });
+
+  const onSubmit = () => refetch();
+
+  const debouncedSubmit = debounce(onSubmit, 400);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const _debouncedSubmit = useCallback(debouncedSubmit, []);
 
   const applyArrayFilter = ({
     category,
@@ -125,6 +132,8 @@ export default function Home() {
         [category]: [...prev[category], value],
       }));
     }
+
+    _debouncedSubmit();
   };
 
   const minPrice = Math.min(filter.price.range[0], filter.price.range[1]);
@@ -156,6 +165,7 @@ export default function Home() {
                       ...prev,
                       sort: option.value,
                     }));
+                    _debouncedSubmit();
                   }}
                 >
                   {option.name}
@@ -273,6 +283,7 @@ export default function Home() {
                                 range: [...option.value],
                               },
                             }));
+                            _debouncedSubmit();
                           }}
                           checked={
                             !filter.price.isCustom &&
@@ -302,6 +313,7 @@ export default function Home() {
                                 range: [0, 100],
                               },
                             }));
+                            _debouncedSubmit();
                           }}
                           checked={filter.price.isCustom}
                           className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
@@ -343,6 +355,7 @@ export default function Home() {
                               range: [newMin, newMax],
                             },
                           }));
+                          _debouncedSubmit();
                         }}
                         value={
                           filter.price.isCustom
@@ -362,13 +375,17 @@ export default function Home() {
           </div>
           {/* Product grid */}
           <ul className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-            {products
-              ? products.map((product) => (
-                  <Product key={product.id} product={product.metadata!} />
-                ))
-              : new Array(12)
-                  .fill(null)
-                  .map((_, i) => <ProductSkeleton key={i} />)}
+            {products && products.length === 0 ? (
+              <EmptyState />
+            ) : products ? (
+              products.map((product) => (
+                <Product key={product.id} product={product.metadata!} />
+              ))
+            ) : (
+              new Array(12)
+                .fill(null)
+                .map((_, i) => <ProductSkeleton key={i} />)
+            )}
           </ul>
         </div>
       </section>
